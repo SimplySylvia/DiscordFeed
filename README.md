@@ -1,6 +1,6 @@
 # Discord Feed
 
-> ⚠️ **Pre-Development Notice**: This project is currently in pre-development phase. The repository is being set up and documentation is being prepared. No code has been implemented yet. Stay tuned for updates!
+> 🚀 **Phase 1 Complete**: OAuth2 Authentication and Channel Indexing features have been implemented. The project is now ready for basic usage.
 
 A unified feed interface for Discord that aggregates unread messages across all your servers into a single, organized view.
 
@@ -170,12 +170,30 @@ interface MessageCache {
 - Redis instance
 - Discord Developer Account
 
+### Documentation
+
+For detailed setup instructions, refer to the documentation:
+
+- [Complete Documentation Index](./docs/README.md)
+- [Environment Setup Guide](./docs/environment-setup.md)
+- [PostgreSQL Setup Guide](./docs/postgresql-setup.md)
+- [Redis Setup Guide](./docs/redis-setup.md)
+- [Docker Compose Setup Guide](./docs/docker-compose-setup.md) (alternative)
+
+### Discord Application Setup
+
+1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+2. Create a new application
+3. Navigate to the "OAuth2" section
+4. Add a redirect URL: `http://localhost:3000/api/auth/callback/discord`
+5. Copy the Client ID and Client Secret to use in your environment variables
+
 ### Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/simplysylvia/discordfeed.git
+   git clone https://github.com/yourusername/discordfeed.git
    cd discordfeed
    ```
 
@@ -187,26 +205,45 @@ interface MessageCache {
 
 3. Set up environment variables:
 
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Fill in the required environment variables in `.env.local`
+   Follow the [Environment Setup Guide](./docs/environment-setup.md) to configure your `.env.local` file.
 
 4. Set up the database:
 
+   Follow the [PostgreSQL Setup Guide](./docs/postgresql-setup.md) or use the [Docker Compose Setup Guide](./docs/docker-compose-setup.md).
+
+   Then run:
+
    ```bash
    npx prisma generate
-   npx prisma migrate dev
+   npx prisma migrate dev --name init
    ```
 
-5. Run the development server:
+5. Set up Redis:
+
+   Follow the [Redis Setup Guide](./docs/redis-setup.md) or use the [Docker Compose Setup Guide](./docs/docker-compose-setup.md).
+
+6. Run the development server:
 
    ```bash
    npm run dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser
+7. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Current Features (Phase 1)
+
+- ✅ Discord OAuth2 authentication
+- ✅ User/server/channel database schema
+- ✅ Channel indexing with rate limit awareness
+- ✅ User preferences system
+- ✅ Basic UI for settings and feed (placeholder)
+
+### Coming Soon (Future Phases)
+
+- 🔜 Message aggregation engine
+- 🔜 Unified feed with infinite scroll
+- 🔜 Message interactions
+- 🔜 Performance optimizations
 
 ## Project Structure
 
@@ -221,6 +258,12 @@ discordfeed/
 ├── prisma/               # Database schema and migrations
 │   ├── schema.prisma     # Prisma schema
 │   └── migrations/       # Database migrations
+├── docs/                 # Documentation
+│   ├── README.md         # Documentation index
+│   ├── environment-setup.md # Environment setup guide
+│   ├── postgresql-setup.md  # PostgreSQL setup guide
+│   ├── redis-setup.md       # Redis setup guide
+│   └── docker-compose-setup.md # Docker Compose setup guide
 └── public/               # Static assets
 ```
 
