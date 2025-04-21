@@ -42,16 +42,19 @@ graph TD
 ### Core Components
 
 1. **Authentication Layer**
+
    - NextAuth.js for Discord OAuth2
    - Secure token management
    - Session handling
 
 2. **Data Layer**
+
    - PostgreSQL for persistent storage
    - Redis for caching and rate limiting
    - Message aggregation engine
 
 3. **API Layer**
+
    - Next.js API Routes
    - Edge-compatible Discord.js
    - Webhook handlers
@@ -64,6 +67,7 @@ graph TD
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15 (App Router)
 - **UI**: React Server Components, Client Components
 - **Styling**: Tailwind CSS
@@ -71,6 +75,7 @@ graph TD
 - **Testing**: Jest, React Testing Library
 
 ### Backend
+
 - **API**: Next.js API Routes
 - **Auth**: NextAuth.js
 - **ORM**: Prisma
@@ -79,6 +84,7 @@ graph TD
 - **Real-time**: WebSocket, Webhooks
 
 ### Infrastructure
+
 - **Hosting**: Vercel (Edge and Serverless Functions)
 - **CI/CD**: GitHub Actions
 - **Monitoring**: Vercel Analytics, Datadog/Prometheus + Grafana
@@ -132,11 +138,13 @@ interface MessageCache {
 ### Performance Optimizations
 
 1. **Edge Network**
+
    - Cache frequent API responses
    - Stale-while-revalidate for message updates
    - Global CDN distribution
 
 2. **Hybrid Rendering**
+
    - Static Server Routes for initial load
    - Dynamic Client Components for interactivity
    - WebSocket for real-time updates
@@ -165,29 +173,35 @@ interface MessageCache {
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/simplysylvia/discordfeed.git
    cd discordfeed
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
 3. Set up environment variables:
+
    ```bash
    cp .env.example .env.local
    ```
+
    Fill in the required environment variables in `.env.local`
 
 4. Set up the database:
+
    ```bash
    npx prisma generate
    npx prisma migrate dev
    ```
 
 5. Run the development server:
+
    ```bash
    npm run dev
    ```
@@ -213,14 +227,17 @@ discordfeed/
 ## Technical Limitations and Workarounds
 
 1. **No Unread Messages API**
+
    - **Workaround**: Track last visit timestamps per channel
    - **Implementation**: Custom logic for message comparison
 
 2. **Rate Limiting**
+
    - **Workaround**: Intelligent caching and staggered API calls
    - **Implementation**: Redis-based rate limiting
 
 3. **Message History**
+
    - **Workaround**: Focus on recent unread messages
    - **Implementation**: On-demand loading
 
@@ -258,4 +275,4 @@ See our [project board](https://github.com/simplysylvia/discordfeed/projects) fo
 
 ---
 
-Made with ❤️ by [Your Name/Organization] 
+Made with ❤️
