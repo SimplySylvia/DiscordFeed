@@ -12,6 +12,17 @@ interface ExtendedUser {
   image?: string | null;
 }
 
+interface UserPreference {
+  id: string;
+  userId: string;
+  refreshInterval: number;
+  showUnreadOnly: boolean;
+  notificationsEnabled: boolean;
+  theme: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -26,6 +37,9 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState<"success" | "error">(
+    "success"
+  );
 
   // If not authenticated, redirect to login
   useEffect(() => {
@@ -45,20 +59,34 @@ export default function SettingsPage() {
   const fetchUserPreferences = async () => {
     try {
       setIsLoading(true);
-      // In a real implementation, this would be an API call
-      // For now, we'll just simulate it with a timeout
-      setTimeout(() => {
+      const response = await fetch("/api/preferences");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch preferences");
+      }
+
+      const data = await response.json();
+
+      if (data.preferences) {
         setPreferences({
-          refreshInterval: 300,
-          showUnreadOnly: true,
-          notificationsEnabled: true,
-          theme: "system",
+          refreshInterval: data.preferences.refreshInterval,
+          showUnreadOnly: data.preferences.showUnreadOnly,
+          notificationsEnabled: data.preferences.notificationsEnabled,
+          theme: data.preferences.theme,
         });
-        setIsLoading(false);
-      }, 500);
+      }
+
+      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching preferences:", error);
       setIsLoading(false);
+      setMessage("Failed to fetch preferences");
+      setMessageType("error");
+
+      // Clear error message after 3 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
     }
   };
 
@@ -66,21 +94,36 @@ export default function SettingsPage() {
   const savePreferences = async () => {
     try {
       setIsSaving(true);
-      // In a real implementation, this would be an API call
-      // For now, we'll just simulate it with a timeout
-      setTimeout(() => {
-        setMessage("Preferences saved successfully");
-        setIsSaving(false);
+      const response = await fetch("/api/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(preferences),
+      });
 
-        // Clear message after 3 seconds
-        setTimeout(() => {
-          setMessage("");
-        }, 3000);
-      }, 500);
+      if (!response.ok) {
+        throw new Error("Failed to save preferences");
+      }
+
+      setMessage("Preferences saved successfully");
+      setMessageType("success");
+      setIsSaving(false);
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
     } catch (error) {
       console.error("Error saving preferences:", error);
       setMessage("Failed to save preferences");
+      setMessageType("error");
       setIsSaving(false);
+
+      // Clear error message after 3 seconds
+      setTimeout(() => {
+        setMessage("");
+      }, 3000);
     }
   };
 
@@ -117,7 +160,13 @@ export default function SettingsPage() {
         <h1 className='text-2xl font-bold mb-6'>User Preferences</h1>
 
         {message && (
-          <div className='mb-4 p-2 bg-green-100 text-green-800 rounded'>
+          <div
+            className={`mb-4 p-2 rounded ${
+              messageType === "success"
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
             {message}
           </div>
         )}
@@ -202,19 +251,21 @@ export default function SettingsPage() {
           <h2 className='text-lg font-semibold mb-4'>Discord Integration</h2>
           <button
             onClick={() => {
-              // In a real implementation, this would trigger the channel indexing API
               fetch("/api/indexing", { method: "POST" })
                 .then((response) => {
                   if (response.ok) {
                     setMessage("Reindexing started in background");
+                    setMessageType("success");
                   } else {
                     setMessage("Failed to start reindexing");
+                    setMessageType("error");
                   }
                   setTimeout(() => setMessage(""), 3000);
                 })
                 .catch((error) => {
                   console.error("Error triggering reindexing:", error);
                   setMessage("Failed to start reindexing");
+                  setMessageType("error");
                   setTimeout(() => setMessage(""), 3000);
                 });
             }}
