@@ -11,7 +11,7 @@ interface DiscordToken {
 }
 
 // Generate Redis key for a Discord token
-const getDiscordTokenKey = (userId: string) => `discord_token:${userId}`;
+const getDiscordTokenKey = (userId: string) => `user:${userId}`;
 
 // Store Discord tokens in Redis
 export async function storeDiscordToken(userId: string, token: DiscordToken): Promise<void> {

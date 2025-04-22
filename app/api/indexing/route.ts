@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
-import { scheduleUserIndexing } from '../../../lib/discord/indexQueue';
+import { startUserIndexing } from '../../../lib/discord/indexQueue';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Schedule indexing for the user
-    const result = await scheduleUserIndexing(token.sub);
+    const result = await startUserIndexing(token.sub);
 
     return NextResponse.json(result);
   } catch (error) {

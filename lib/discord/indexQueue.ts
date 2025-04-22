@@ -13,11 +13,16 @@ export function initIndexingProcessors() {
   indexUserQueue.process(async (job) => {
     const { userId } = job.data;
 
+    console.log('Indexing user:', userId);
+    console.log('Prisma:', prisma.user);
+
     try {
       // Get user
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
+
+      console.log('User:', user);
 
       if (!user || !user.accessToken) {
         throw new Error(`User ${userId} not found or missing access token`);

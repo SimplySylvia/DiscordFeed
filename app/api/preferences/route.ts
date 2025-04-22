@@ -4,21 +4,12 @@ import { authOptions } from '../auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { Session } from 'next-auth';
 
-// Extended Session interface
-interface ExtendedSession extends Session {
-  user: {
-    id?: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-  }
-}
 
 // Get user preferences
 export async function GET(request: NextRequest) {
   try {
     // Get session
-    const session = await getServerSession(authOptions) as ExtendedSession | null;
+    const session = await getServerSession(authOptions) as Session | null;
 
     // Check if user is authenticated
     if (!session || !session.user?.id) {
@@ -50,7 +41,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Get session
-    const session = await getServerSession(authOptions) as ExtendedSession | null;
+    const session = await getServerSession(authOptions) as Session | null;
 
     // Check if user is authenticated
     if (!session || !session.user?.id) {
