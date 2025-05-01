@@ -1,3 +1,21 @@
+# ⚠️ DEPRECATED: DiscordFeed is No Longer Supported
+
+**This project is now deprecated and should not be used for new development.**
+
+## Deprecation Reason
+
+Due to limitations in the Discord API, it is not possible to aggregate messages for users across multiple servers/channels on their behalf unless a dedicated bot is invited to every server and channel the user wishes to aggregate. Discord does **not** allow:
+
+- Polling or aggregating server messages via OAuth2 or user tokens (this is against Discord's Terms of Service and technically restricted).
+- Accessing server messages for a user unless your application is a bot and is explicitly invited to each server/channel.
+
+**This means:**
+
+- You cannot build a "universal Discord inbox" or message aggregator for arbitrary users/servers without requiring every user to install your bot in every server/channel they want to aggregate.
+- The only supported way to access server messages is via a bot with the correct permissions, which is not feasible for a general-purpose aggregator.
+
+For more details, see the [Discord API documentation](https://discord.com/developers/docs/intro) and [Terms of Service](https://discord.com/terms).
+
 # Discord Feed
 
 > 🚀 **Phase 1 Complete**: OAuth2 Authentication and Channel Indexing features have been implemented. The project is now ready for basic usage.
