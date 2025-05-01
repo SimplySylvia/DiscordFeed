@@ -1,8 +1,7 @@
 import Bull from 'bull';
 import { prisma } from '../prisma';
 import Redis from 'ioredis';
-// import { fetchMessagesFromDiscord } from './api'; // Integration point for Discord.js
-import { setInterval } from 'timers';
+import { DiscordAPI } from './api';
 
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = new Redis(redisUrl);
@@ -54,15 +53,21 @@ async function storeMessagesAndUpdateCache(channelId: string, messages: any[]) {
 messageAggregationQueue.process('fetch-messages', async (job) => {
   const { channelId, lastFetchedAt } = job.data;
   try {
-    // TODO: Replace with actual Discord API call
-    // const messages: MessageType[] = await fetchMessagesFromDiscord(channelId, lastFetchedAt);
-    const messages: any[] = [];
-    // Example message structure for placeholder
-    // messages = [{ id, authorId, content, timestamp, attachments, embeds, reactions }]
+    // Integrate Discord API call
+    // For now, use a system userId or bot userId (replace with per-user tokens if needed)
+    const systemUserId = process.env.DISCORD_BOT_USER_ID || process.env.SYSTEM_USER_ID || '';
+    const discordApi = new DiscordAPI(systemUserId);
+    // Fetch messages after lastFetchedAt if available, else fetch latest 50
+    let messages: any[] = [];
+    if (lastFetchedAt) {
+      messages = await discordApi.fetchChannelMessages(channelId, { after: lastFetchedAt, limit: 50 });
+    } else {
+      messages = await discordApi.fetchChannelMessages(channelId, { limit: 50 });
+    }
 
+    console.log('messages', messages);
     // Store in DB and update cache
     await storeMessagesAndUpdateCache(channelId, messages);
-
     // TODO: Update lastFetchedAt in job data or DB if needed
     // TODO: Handle rate limits (track in Redis)
     return { status: 'fetched', channelId, count: messages.length };
@@ -72,19 +77,23 @@ messageAggregationQueue.process('fetch-messages', async (job) => {
   }
 });
 
+// Helper: Refresh Redis cache for a channel (latest 50 messages)
+export async function refreshChannelCache(channelId: string) {
+  const messages = await prisma.messageCache.findMany({
+    where: { channelId },
+    orderBy: { timestamp: 'desc' },
+    take: 50,
+  });
+  await redis.set(`channel:${channelId}:messages`, JSON.stringify(messages));
+  return messages.length;
+}
+
 // Job processor: refresh-cache
 messageAggregationQueue.process('refresh-cache', async (job) => {
   const { channelId } = job.data;
   try {
-    // Load latest 50 messages from DB
-    const messages = await prisma.messageCache.findMany({
-      where: { channelId },
-      orderBy: { timestamp: 'desc' },
-      take: 50,
-    });
-    // Update Redis cache
-    await redis.set(`channel:${channelId}:messages`, JSON.stringify(messages));
-    return { status: 'cache-refreshed', channelId, count: messages.length };
+    const count = await refreshChannelCache(channelId);
+    return { status: 'cache-refreshed', channelId, count };
   } catch (error: any) {
     // Optionally, re-queue as retry-failed
     await messageAggregationQueue.add('retry-failed', { channelId, attempt: 1 });
@@ -113,16 +122,13 @@ messageAggregationQueue.process('priority-fetch', async (job) => {
   return { status: 'priority-fetched', channelId, userId };
 });
 
-// Placeholder: Fetch prioritized channels (to be replaced with real logic)
+// Fetch prioritized channels from the database (all channels, default priority 5)
 async function getPrioritizedChannels() {
-  // TODO: Integrate with user preferences and activity tracking
-  // Example: Fetch channels sorted by priority and recent activity
-  // Return array of { channelId, priority }
-  return [
-    { channelId: 'channel1', priority: 10 },
-    { channelId: 'channel2', priority: 5 },
-    // ...
-  ];
+  const channels = await prisma.discordChannel.findMany();
+  return channels.map(channel => ({
+    channelId: channel.id,
+    priority: 5, // You can adjust this logic as needed
+  }));
 }
 
 // Helper: Convert priority to cron interval (example: higher priority = more frequent)
@@ -154,17 +160,14 @@ async function scheduleRepeatableFetchJobs() {
 scheduleRepeatableFetchJobs();
 // Optionally, expose a function to re-run this when priorities/activity change
 
-// Fallback polling for channels without webhook support
-
-// Placeholder: Identify channels without webhooks (to be replaced with real logic)
+// Fetch channels without webhooks from the database (for now, same as all channels)
 async function getChannelsWithoutWebhooks() {
-  // TODO: Integrate with channel metadata and webhook tracking in DB
-  // Return array of { channelId, priority }
-  return [
-    { channelId: 'channel3', priority: 3 },
-    { channelId: 'channel4', priority: 2 },
-    // ...
-  ];
+  // TODO: Filter for channels without webhooks if you track this in your DB
+  const channels = await prisma.discordChannel.findMany();
+  return channels.map(channel => ({
+    channelId: channel.id,
+    priority: 5,
+  }));
 }
 
 // Schedule repeatable polling jobs for channels without webhooks

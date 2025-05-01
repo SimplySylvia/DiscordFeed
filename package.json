@@ -11,7 +11,8 @@
     "db:migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:generate": "dotenv -e .env.local -- prisma generate",
-    "bull-board": "tsx scripts/bull-board.ts"
+    "bull-board": "tsx scripts/bull-board.ts",
+    "verify": "dotenv -e .env.local -- npx tsx lib/discord/messageAggregation.verify.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",

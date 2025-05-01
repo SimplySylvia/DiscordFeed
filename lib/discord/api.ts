@@ -1,4 +1,5 @@
 import { getDiscordToken, storeDiscordToken, tokenNeedsRefresh } from '../auth/redis';
+import Redis from 'ioredis';
 
 // Discord API base URL
 const DISCORD_API_BASE = 'https://discord.com/api/v10';
@@ -24,9 +25,11 @@ export class DiscordAPI {
   private userId: string;
   private retryCount: number = 0;
   private maxRetries: number = 3;
+  private redis: Redis;
 
   constructor(userId: string) {
     this.userId = userId;
+    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
   }
 
   // Get user guilds (servers)
@@ -44,6 +47,17 @@ export class DiscordAPI {
     return this.makeRequest<DiscordGuild>(`/guilds/${guildId}`);
   }
 
+  // Fetch messages from a channel
+  async fetchChannelMessages(channelId: string, options?: { after?: string; before?: string; limit?: number }) {
+    let endpoint = `/channels/${channelId}/messages`;
+    const params = [];
+    if (options?.after) params.push(`after=${options.after}`);
+    if (options?.before) params.push(`before=${options.before}`);
+    if (options?.limit) params.push(`limit=${options.limit}`);
+    if (params.length) endpoint += `?${params.join('&')}`;
+    return this.makeRequest<any[]>(endpoint);
+  }
+
   // Make a request to the Discord API with rate limit handling
   private async makeRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const token = await this.getValidToken();
@@ -58,6 +72,21 @@ export class DiscordAPI {
       'Content-Type': 'application/json',
     };
 
+    // --- Rate limit check before request ---
+    // Use endpoint as bucket key (can be improved with Discord's bucket system)
+    const bucketKey = `discord:ratelimit:${endpoint}`;
+    const rateLimitData = await this.redis.get(bucketKey);
+    if (rateLimitData) {
+      const { remaining, reset } = JSON.parse(rateLimitData);
+      const now = Math.floor(Date.now() / 1000);
+      if (remaining !== undefined && remaining <= 0 && reset && now < reset) {
+        // Wait until reset
+        const waitMs = (reset - now) * 1000;
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+      }
+    }
+    // --- End rate limit check ---
+
     const response = await fetch(url, {
       ...options,
       headers: {
@@ -65,6 +94,30 @@ export class DiscordAPI {
         ...headers,
       },
     });
+
+    // --- Store rate limit headers in Redis ---
+    const limit = response.headers.get('x-ratelimit-limit');
+    const remaining = response.headers.get('x-ratelimit-remaining');
+    const reset = response.headers.get('x-ratelimit-reset');
+    const resetAfter = response.headers.get('x-ratelimit-reset-after');
+    const bucket = response.headers.get('x-ratelimit-bucket');
+    const retryAfter = response.headers.get('retry-after');
+    if (limit && remaining && reset) {
+      await this.redis.set(
+        bucketKey,
+        JSON.stringify({
+          limit: parseInt(limit, 10),
+          remaining: parseInt(remaining, 10),
+          reset: parseInt(reset, 10),
+          resetAfter: resetAfter ? parseFloat(resetAfter) : undefined,
+          bucket,
+          retryAfter: retryAfter ? parseInt(retryAfter, 10) : undefined,
+        }),
+        'EX',
+        Math.max(1, parseInt(reset, 10) - Math.floor(Date.now() / 1000))
+      );
+    }
+    // --- End store rate limit headers ---
 
     // Handle rate limiting
     if (response.status === 429) {

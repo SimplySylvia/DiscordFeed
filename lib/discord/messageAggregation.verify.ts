@@ -1,3 +1,3 @@
-import { messageAggregationQueue } from "./messageAggregationQueue";
+import { messageAggregationQueue, MessageAggregationJobTypes } from "./messageAggregationQueue";
 
-messageAggregationQueue.add('fetch-messages', { channelId: '1332906761929097267' });
+messageAggregationQueue.add(MessageAggregationJobTypes.FETCH_MESSAGES, { channelId: '184198840142790656' });
