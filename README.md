@@ -316,6 +316,20 @@ For support, please open an issue in the GitHub repository or join our [Discord 
 
 See our [project board](https://github.com/simplysylvia/discordfeed/projects) for planned features and future development.
 
+## Bull Board: Queue Monitoring
+
+For local development, you can monitor all Bull queues (including message aggregation) using Bull Board:
+
+### Launch Bull Board
+
+```bash
+npx ts-node scripts/bull-board.ts
+```
+
+This will start a dashboard at [http://localhost:3001/admin/queues](http://localhost:3001/admin/queues) where you can view, retry, and manage jobs.
+
+**Note:** Bull Board is for local/dev use. For production, secure access or run Bull Board as a separate, protected service.
+
 ---
 
 Made with ❤️

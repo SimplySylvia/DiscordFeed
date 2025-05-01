@@ -161,4 +161,43 @@ export class DiscordAPI {
       return null;
     }
   }
+}
+
+// Register a Discord webhook for a channel
+export async function registerDiscordWebhook({
+  userId,
+  channelId,
+  name = 'DiscordFeed Webhook',
+  avatar = undefined,
+  callbackUrl,
+}: {
+  userId: string;
+  channelId: string;
+  name?: string;
+  avatar?: string;
+  callbackUrl: string;
+}): Promise<{ webhookId: string; webhookUrl: string }> {
+  // Requires MANAGE_WEBHOOKS permission for the channel
+  const token = await getDiscordToken(userId);
+  if (!token) throw new Error('No valid Discord token available');
+
+  const url = `${DISCORD_API_BASE}/channels/${channelId}/webhooks`;
+  const body = {
+    name,
+    avatar,
+    url: callbackUrl, // Not used by Discord, but document for clarity
+  };
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, avatar }),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to register webhook: ${response.status}`);
+  }
+  const data = await response.json();
+  return { webhookId: data.id, webhookUrl: data.url };
 } 

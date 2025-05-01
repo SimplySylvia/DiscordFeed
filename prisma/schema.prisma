@@ -60,6 +60,7 @@ model DiscordChannel {
   createdAt   DateTime        @default(now()) @map("created_at")
   updatedAt   DateTime        @updatedAt @map("updated_at")
   lastReads   LastRead[]
+  messages    MessageCache[]
 
   @@map("discord_channels")
 }
@@ -134,4 +135,30 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model MessageCache {
+  id            String         @id @default(cuid())
+  discordMsgId  String         @unique @map("discord_msg_id")
+  channel       DiscordChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  channelId     String         @map("channel_id")
+  authorId      String         @map("author_id")
+  content       String
+  timestamp     DateTime
+  isRead        Boolean        @default(false) @map("is_read")
+  attachments   Json?
+  embeds        Json?
+  reactions     Json?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+}
+
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique @map("event_id")
+  type        String
+  payload     Json
+  receivedAt  DateTime @default(now()) @map("received_at")
+  processedAt DateTime? @map("processed_at")
+  status      String
 }

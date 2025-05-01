@@ -44,3 +44,15 @@ If you encounter issues during setup or running the application, please refer to
 ## Contributing
 
 Please read our [Contributing Guidelines](../CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## Bull Board (Queue Monitoring)
+
+For local development, monitor Bull queues with Bull Board:
+
+- Run:
+  ```bash
+  npx ts-node scripts/bull-board.ts
+  ```
+- Open [http://localhost:3001/admin/queues](http://localhost:3001/admin/queues)
+
+**Note:** For local/dev use only. Secure or restrict access in production.

@@ -131,3 +131,19 @@ After setting up your environment variables:
 2. Set up [Redis](./redis-setup.md)
 3. Run database migrations to initialize your schema
 4. Start the application with `npm run dev`
+
+## Bull Board (Queue Monitoring)
+
+For local development, you can monitor Bull queues using Bull Board:
+
+1. Install dependencies (if not already):
+   ```bash
+   npm install --save-dev @bull-board/express @bull-board/api @types/express
+   ```
+2. Run the Bull Board script:
+   ```bash
+   npx ts-node scripts/bull-board.ts
+   ```
+3. Open [http://localhost:3001/admin/queues](http://localhost:3001/admin/queues) in your browser.
+
+**Note:** Bull Board is for local/dev use. Do not expose it publicly in production without authentication.
