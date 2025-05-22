@@ -20,15 +20,75 @@
 >
 > </details>
 
+---
+
 # Discord Feed
 
 A unified feed interface for Discord that aggregates unread messages across all your servers into a single, organized view.
 
+<!-- Frontend -->
+
+**Frontend**
 [![Next.js](https://img.shields.io/badge/Next.js-15.0.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org) [![React](https://img.shields.io/badge/React-18.2.0-blue?style=for-the-badge&logo=react)](https://reactjs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
 
-[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org) [![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io) [![Bull](https://img.shields.io/badge/Bull-4.16.5-FF0000?style=for-the-badge&logo=npm)](https://github.com/OptimalBits/bull) [![Bull Board](https://img.shields.io/badge/Bull_Board-6.9.2-FF0000?style=for-the-badge&logo=npm)](https://github.com/felixmosh/bull-board) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com) [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions)
+<!-- Backend & Infrastructure -->
 
-[![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io)
+**Backend & Infrastructure**
+[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org) [![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io) [![Bull](https://img.shields.io/badge/Bull-4.16.5-FF0000?style=for-the-badge&logo=npm)](https://github.com/OptimalBits/bull) [![Bull Board](https://img.shields.io/badge/Bull_Board-6.9.2-FF0000?style=for-the-badge&logo=npm)](https://github.com/felixmosh/bull-board)
+
+<!-- DevOps & Tooling -->
+
+**DevOps & Tooling**
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions) [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
+
+---
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Authentication Flow](#authentication-flow)
+- [Message & Channel Indexing](#message--channel-indexing)
+- [Tech Stack](#tech-stack)
+  - [Frontend](#frontend)
+  - [Backend](#backend)
+  - [Infrastructure & Tooling](#infrastructure--tooling)
+- [Database Usage](#database-usage)
+- [Technical Architecture](#technical-architecture)
+  - [System Design](#system-design)
+  - [Core Components](#core-components)
+- [Scalability and Load Balancing](#scalability-and-load-balancing)
+  - [Application Layer](#application-layer)
+  - [Data Layer](#data-layer)
+  - [Message Aggregation & Job Queue](#message-aggregation--job-queue)
+  - [Caching & Rate Limiting](#caching--rate-limiting)
+  - [Real-Time & Webhooks](#real-time--webhooks)
+  - [Edge Network & CDN](#edge-network--cdn)
+  - [Load Balancing Strategies](#load-balancing-strategies)
+- [Implementation Details](#implementation-details)
+  - [Performance Optimizations](#performance-optimizations)
+  - [API Integration](#api-integration)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Documentation](#documentation)
+  - [Discord Application Setup](#discord-application-setup)
+  - [Installation](#installation)
+- [Testing](#testing)
+  - [Running Tests](#running-tests)
+  - [Test Setup](#test-setup)
+  - [Installing Test Dependencies](#installing-test-dependencies)
+  - [Example Test Script in package.json](#example-test-script-in-packagejson)
+  - [Configuration Files](#configuration-files)
+- [Bull Board: Queue Monitoring](#bull-board-queue-monitoring)
+  - [Launch Bull Board](#launch-bull-board)
+- [Project Structure](#project-structure)
+- [Technical Limitations and Workarounds](#technical-limitations-and-workarounds)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+- [Support](#support)
+
+---
 
 ## Overview
 
@@ -107,15 +167,22 @@ Discord Feed solves the common problem of missing important messages across mult
   - Hybrid real-time/polling update strategy, with clear documentation of workarounds and limitations.
 
 - 🗺️ **Planned & Future Features**
+
   - Infinite scroll, advanced message interactions, engagement analytics, offline support, and more (see Roadmap).
+
+---
 
 ## Authentication Flow
 
 DiscordFeed uses secure Discord OAuth2 authentication for user login and authorization. The authentication system is built with NextAuth.js, leveraging JWT sessions and Redis for token management. For a detailed step-by-step overview of the OAuth flow, see [User Authorization & OAuth Flow](./docs/user-authorization.md).
 
+---
+
 ## Message & Channel Indexing
 
 DiscordFeed uses a background queue-based system to efficiently index your Discord servers, channels, and messages. When you log in, the app checks if your servers and channels are already indexed. If not, it triggers a background process that fetches your server and channel data from Discord, stores it in the database, and schedules message aggregation jobs. Messages are fetched both on a schedule and in real-time via webhooks, and unread counts are calculated using message timestamps and your last read position. For a detailed breakdown of this process, see [Message & Channel Indexing Flow](./docs/indexing.md).
+
+---
 
 ## Tech Stack
 
@@ -150,6 +217,8 @@ DiscordFeed uses a background queue-based system to efficiently index your Disco
 - **Linting:** ESLint, eslint-config-next
 - **Code Formatting:** Prettier
 
+---
+
 ## Database Usage
 
 This project uses **PostgreSQL** as its primary database, managed through the [Prisma](https://www.prisma.io/) ORM. Prisma provides type-safe database access, schema migrations, and a modern query builder for Node.js and TypeScript. All data models, relationships, and migrations are defined in the [`prisma/`](./prisma) directory.
@@ -158,6 +227,8 @@ This project uses **PostgreSQL** as its primary database, managed through the [P
 - **Migrations**: Database schema changes are tracked and applied using Prisma Migrate.
 - **Schema**: The full data model and entity relationships are defined in [`prisma/schema.prisma`](./prisma/schema.prisma).
 - **Visual ERD**: For a full entity relationship diagram and more Prisma-specific documentation, see [`prisma/README.md`](./prisma/README.md).
+
+---
 
 ## Technical Architecture
 
@@ -198,6 +269,8 @@ graph TD
    - React Server Components
    - Client Components for interactivity
    - Real-time updates via WebSocket
+
+---
 
 ## Scalability and Load Balancing
 
@@ -255,6 +328,8 @@ DiscordFeed is architected for horizontal scalability and robust load balancing 
 
 **In summary:** DiscordFeed is designed for robust, cloud-native scalability and can handle high load by distributing work across multiple stateless services, background workers, and managed infrastructure components. Load balancing is achieved at both the application and background processing layers, coordinated via Redis and managed by the hosting/cloud platform's load balancer.
 
+---
+
 ## Implementation Details
 
 ### Performance Optimizations
@@ -282,6 +357,8 @@ DiscordFeed is architected for horizontal scalability and robust load balancing 
 - Channel/message endpoints for data retrieval
 - Gateway API for real-time updates
 - Webhooks for notifications
+
+---
 
 ## Getting Started
 
@@ -325,11 +402,17 @@ For detailed setup instructions, refer to the documentation:
    npm install
    ```
 
-3. Set up environment variables:
+3. (Optional) To run tests and verify your setup:
+
+   ```bash
+   npm run test
+   ```
+
+4. Set up environment variables:
 
    Follow the [Environment Setup Guide](./docs/environment-setup.md) to configure your `.env.local` file.
 
-4. Set up the database:
+5. Set up the database:
 
    Follow the [PostgreSQL Setup Guide](./docs/postgresql-setup.md) or use the [Docker Compose Setup Guide](./docs/docker-compose-setup.md).
 
@@ -340,17 +423,78 @@ For detailed setup instructions, refer to the documentation:
    npx prisma migrate dev --name init
    ```
 
-5. Set up Redis:
+6. Set up Redis:
 
    Follow the [Redis Setup Guide](./docs/redis-setup.md) or use the [Docker Compose Setup Guide](./docs/docker-compose-setup.md).
 
-6. Run the development server:
+7. Run the development server:
 
    ```bash
    npm run dev
    ```
 
-7. Open [http://localhost:3000](http://localhost:3000) in your browser
+8. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+---
+
+## Testing
+
+This project uses **Jest** and **React Testing Library** for unit and integration testing, with full TypeScript support.
+
+### Running Tests
+
+To run all tests:
+
+```bash
+npm run test
+```
+
+### Test Setup
+
+- **Jest** is configured for TypeScript using `ts-jest`.
+- **React Testing Library** is used for component testing.
+- The test environment is set to `jsdom` for browser-like testing.
+- All test files should use the `.test.ts` or `.test.tsx` extension and can be placed next to the components or in a `__tests__/` directory.
+
+### Installing Test Dependencies
+
+If you need to install test dependencies manually, run:
+
+```bash
+npm install --save-dev jest @types/jest ts-jest @testing-library/react @testing-library/jest-dom @testing-library/user-event identity-obj-proxy jest-environment-jsdom
+```
+
+### Example Test Script in package.json
+
+```json
+"scripts": {
+  // ...other scripts
+  "test": "jest"
+}
+```
+
+### Configuration Files
+
+- `jest.config.js`: Jest configuration for TypeScript and React Testing Library.
+- `jest.setup.ts`: Jest setup file for extending Jest matchers.
+
+For more details, see the configuration files in the project root.
+
+## Bull Board: Queue Monitoring
+
+For local development, you can monitor all Bull queues (including message aggregation) using Bull Board:
+
+### Launch Bull Board
+
+```bash
+npx ts-node scripts/bull-board.ts
+```
+
+This will start a dashboard at [http://localhost:3001/admin/queues](http://localhost:3001/admin/queues) where you can view, retry, and manage jobs.
+
+**Note:** Bull Board is for local/dev use. For production, secure access or run Bull Board as a separate, protected service.
+
+---
 
 ## Project Structure
 
@@ -413,6 +557,8 @@ discordfeed/
 └── README.md               # Main project readme
 ```
 
+---
+
 ## Technical Limitations and Workarounds
 
 1. **No Unread Messages API**
@@ -433,6 +579,8 @@ discordfeed/
 4. **Real-time Updates**
    - **Workaround**: Webhooks + periodic polling
    - **Implementation**: Hybrid update strategy
+
+---
 
 ## Contributing
 
@@ -456,25 +604,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-For support, please open an issue in the GitHub repository or join our [Discord server](https://discord.gg/your-server).
-
-## Roadmap
-
-See our [project board](https://github.com/simplysylvia/discordfeed/projects) for planned features and future development.
-
-## Bull Board: Queue Monitoring
-
-For local development, you can monitor all Bull queues (including message aggregation) using Bull Board:
-
-### Launch Bull Board
-
-```bash
-npx ts-node scripts/bull-board.ts
-```
-
-This will start a dashboard at [http://localhost:3001/admin/queues](http://localhost:3001/admin/queues) where you can view, retry, and manage jobs.
-
-**Note:** Bull Board is for local/dev use. For production, secure access or run Bull Board as a separate, protected service.
+For support, please open an issue in the GitHub repository.
 
 ---
 
