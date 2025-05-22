@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
+    "auth:setup": "node e2e/auth-setup.js",
+    "test:e2e": "node e2e/auth-setup.js && playwright test",
     "db:migrate:init": "dotenv -e .env.local -- prisma migrate dev --name init",
     "db:migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
@@ -31,6 +33,7 @@
   "devDependencies": {
     "@bull-board/api": "^6.9.2",
     "@bull-board/express": "^6.9.2",
+    "@playwright/test": "^1.52.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",

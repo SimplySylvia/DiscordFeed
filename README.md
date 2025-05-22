@@ -39,7 +39,7 @@ A unified feed interface for Discord that aggregates unread messages across all 
 <!-- DevOps & Tooling -->
 
 **DevOps & Tooling**
-[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions) [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com)
+[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions) [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com) [![Playwright](https://img.shields.io/badge/Playwright-E2E-green?style=for-the-badge&logo=playwright)](https://playwright.dev)
 
 ---
 
@@ -75,6 +75,7 @@ A unified feed interface for Discord that aggregates unread messages across all 
   - [Installation](#installation)
 - [Testing](#testing)
   - [Running Tests](#running-tests)
+  - [End-to-End (E2E) Testing with Playwright](#end-to-end-e2e-testing-with-playwright)
   - [Test Setup](#test-setup)
   - [Installing Test Dependencies](#installing-test-dependencies)
   - [Example Test Script in package.json](#example-test-script-in-packagejson)
@@ -193,7 +194,7 @@ DiscordFeed uses a background queue-based system to efficiently index your Disco
 - **Styling:** Tailwind CSS
 - **State Management:** React Context, Server Actions
 - **Type Checking:** TypeScript 5
-- **Testing:** Jest, React Testing Library
+- **Testing:** Jest, React Testing Library, **Playwright (E2E)**
 
 ### Backend
 
@@ -212,6 +213,7 @@ DiscordFeed uses a background queue-based system to efficiently index your Disco
 - **Monitoring:** Vercel Analytics (Datadog/Prometheus + Grafana — planned)
 - **Logging:** (ELK Stack — planned)
 - **Queue Monitoring:** Bull Board (@bull-board/api, @bull-board/express)
+- **E2E Testing:** **Playwright**
 - **Environment Management:** dotenv-cli
 - **Build Tools:** tsx, TypeScript, PostCSS, Autoprefixer
 - **Linting:** ESLint, eslint-config-next
@@ -439,37 +441,75 @@ For detailed setup instructions, refer to the documentation:
 
 ## Testing
 
-This project uses **Jest** and **React Testing Library** for unit and integration testing, with full TypeScript support.
+This project uses **Jest** and **React Testing Library** for unit and integration testing, and **Playwright** for end-to-end (E2E) testing with full TypeScript support.
 
 ### Running Tests
 
-To run all tests:
+To run all unit and integration tests:
 
 ```bash
 npm run test
 ```
 
+### End-to-End (E2E) Testing with Playwright
+
+**Playwright** is used for E2E browser testing. E2E tests are located in the `e2e/` directory and cover authentication, navigation, feed, settings, and more.
+
+#### Running E2E Tests
+
+1. **Ensure your development server is running:**
+   ```bash
+   npm run dev
+   ```
+2. **(First time only) Set up authentication state:**
+   - Run the following command to open a browser and log in via Discord:
+     ```bash
+     npx playwright test e2e/auth.setup.spec.ts --headed --project=chromium
+     ```
+   - Complete the login in the browser window, then resume the test in the Playwright UI. This will save your authentication state to `e2e/.auth/user.json`.
+   - You only need to do this once, unless you delete the `.auth/user.json` file.
+3. **Run all E2E tests:**
+   ```bash
+   npm run test:e2e
+   ```
+   or directly:
+   ```bash
+   npx playwright test e2e
+   ```
+
+#### Notes
+
+- The E2E tests will use the saved authentication state for logged-in scenarios.
+- If you need to reset authentication, delete `e2e/.auth/user.json` and repeat step 2.
+- Playwright tests can be run in headless or headed mode. For debugging, add `--headed`.
+- To run a single test file or test, use:
+  ```bash
+  npx playwright test e2e/feed.spec.ts
+  ```
+
 ### Test Setup
 
 - **Jest** is configured for TypeScript using `ts-jest`.
 - **React Testing Library** is used for component testing.
-- The test environment is set to `jsdom` for browser-like testing.
-- All test files should use the `.test.ts` or `.test.tsx` extension and can be placed next to the components or in a `__tests__/` directory.
+- **Playwright** is configured for E2E browser testing.
+- The test environment is set to `jsdom` for browser-like testing (unit/integration).
+- All test files should use the `.test.ts`, `.test.tsx`, or `.spec.ts` extension and can be placed next to the components or in a `__tests__/` or `e2e/` directory.
 
 ### Installing Test Dependencies
 
 If you need to install test dependencies manually, run:
 
 ```bash
-npm install --save-dev jest @types/jest ts-jest @testing-library/react @testing-library/jest-dom @testing-library/user-event identity-obj-proxy jest-environment-jsdom
+npm install --save-dev jest @types/jest ts-jest @testing-library/react @testing-library/jest-dom @testing-library/user-event identity-obj-proxy jest-environment-jsdom playwright @playwright/test
 ```
 
-### Example Test Script in package.json
+### Example Test Scripts in package.json
 
 ```json
 "scripts": {
   // ...other scripts
-  "test": "jest"
+  "test": "jest",
+  "test:e2e": "node e2e/auth-setup.js && playwright test"
 }
 ```
 
@@ -477,8 +517,10 @@ npm install --save-dev jest @types/jest ts-jest @testing-library/react @testing-
 
 - `jest.config.js`: Jest configuration for TypeScript and React Testing Library.
 - `jest.setup.ts`: Jest setup file for extending Jest matchers.
+- `playwright.config.ts`: Playwright configuration for E2E tests.
+- `e2e/auth-setup.js`: Script to ensure authentication state is set up before running E2E tests.
 
-For more details, see the configuration files in the project root.
+For more details, see the configuration files in the project root and the `e2e/` directory.
 
 ## Bull Board: Queue Monitoring
 
