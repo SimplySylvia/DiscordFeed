@@ -1,32 +1,34 @@
-# ⚠️ DEPRECATED: DiscordFeed is No Longer Supported
-
-**This project is now deprecated and should not be used for new development.**
-
-## Deprecation Reason
-
-Due to limitations in the Discord API, it is not possible to aggregate messages for users across multiple servers/channels on their behalf unless a dedicated bot is invited to every server and channel the user wishes to aggregate. Discord does **not** allow:
-
-- Polling or aggregating server messages via OAuth2 or user tokens (this is against Discord's Terms of Service and technically restricted).
-- Accessing server messages for a user unless your application is a bot and is explicitly invited to each server/channel.
-
-**This means:**
-
-- You cannot build a "universal Discord inbox" or message aggregator for arbitrary users/servers without requiring every user to install your bot in every server/channel they want to aggregate.
-- The only supported way to access server messages is via a bot with the correct permissions, which is not feasible for a general-purpose aggregator.
-
-For more details, see the [Discord API documentation](https://discord.com/developers/docs/intro) and [Terms of Service](https://discord.com/terms).
+> ### ⚠️ DEPRECATED: DiscordFeed is No Longer Supported
+>
+> **This project is now deprecated and should not be used for new development.**
+>
+> <details>
+> <summary>Why?</summary>
+>
+> Due to limitations in the Discord API, it is not possible to aggregate messages for users across multiple servers/channels on their behalf unless a dedicated bot is invited to every server and channel the user wishes to aggregate.
+> Discord does **not** allow:
+>
+> - Polling or aggregating server messages via OAuth2 or user tokens (this is against Discord's Terms of Service and technically restricted).
+> - Accessing server messages for a user unless your application is a bot and is explicitly invited to each server/channel.
+>
+> **This means:**
+>
+> - You cannot build a "universal Discord inbox" or message aggregator for arbitrary users/servers without requiring every user to install your bot in every server/channel they want to aggregate.
+> - The only supported way to access server messages is via a bot with the correct permissions, which is not feasible for a general-purpose aggregator.
+>
+> _For more details, see the [Discord API documentation](https://discord.com/developers/docs/intro) and [Terms of Service](https://discord.com/terms)._
+>
+> </details>
 
 # Discord Feed
 
-> 🚀 **Phase 1 Complete**: OAuth2 Authentication and Channel Indexing features have been implemented. The project is now ready for basic usage.
-
 A unified feed interface for Discord that aggregates unread messages across all your servers into a single, organized view.
 
-[![Next.js](https://img.shields.io/badge/Next.js-15.0.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org)
-[![React](https://img.shields.io/badge/React-18.2.0-blue?style=for-the-badge&logo=react)](https://reactjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org)
-[![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io)
+[![Next.js](https://img.shields.io/badge/Next.js-15.0.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org) [![React](https://img.shields.io/badge/React-18.2.0-blue?style=for-the-badge&logo=react)](https://reactjs.org) [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org) [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+
+[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org) [![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io) [![Bull](https://img.shields.io/badge/Bull-4.16.5-FF0000?style=for-the-badge&logo=npm)](https://github.com/OptimalBits/bull) [![Bull Board](https://img.shields.io/badge/Bull_Board-6.9.2-FF0000?style=for-the-badge&logo=npm)](https://github.com/felixmosh/bull-board) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com) [![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions)
+
+[![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io)
 
 ## Overview
 
@@ -34,13 +36,128 @@ Discord Feed solves the common problem of missing important messages across mult
 
 ### Key Features
 
-- 🔐 Secure Discord OAuth2 authentication
-- 📱 Unified feed of unread messages across all servers
-- 🔄 Real-time message updates
-- 🎨 Discord-inspired interface
-- 📊 Server and channel prioritization
-- 🔔 Customizable notification settings
-- 📱 Mobile-responsive design
+- 🔐 **Secure Discord OAuth2 Authentication**
+
+  - Built with NextAuth.js, JWT sessions, and Redis for robust, scalable, and secure login and session management.
+  - Edge middleware for fast token validation and secure token refresh.
+
+- 📨 **Unified Feed of Unread Messages**
+
+  - Aggregates unread messages from all your Discord servers and channels into a single, chronological feed.
+  - Grouped by server and channel, with clear visual indicators and infinite scroll for seamless browsing.
+  - Real-time unread status using custom logic (last visit timestamps, message comparison) due to Discord API limitations.
+
+- 🔄 **Real-Time Updates & Synchronization**
+
+  - Webhook-first architecture for instant updates where supported, with intelligent polling fallback for all other channels.
+  - WebSocket support for live feed updates and cross-device sync.
+  - Read status and preferences sync across devices.
+
+- 🛠️ **Advanced Message Aggregation Engine**
+
+  - Efficient background job system (Bull + Redis) for message fetching, caching, and unread logic.
+  - Prioritizes high-activity or user-preferred channels for faster updates.
+  - Handles Discord API rate limits with intelligent scheduling and retry/backoff strategies.
+
+- 🧩 **Customizable User Experience**
+
+  - User preferences for notification settings, refresh intervals, theme (light/dark/system), and more.
+  - Filter feed by server, channel, or message type; mute/hide channels; prioritize important servers/channels.
+  - Settings UI for managing all preferences.
+
+- 📱 **Mobile-Responsive & Accessible Design**
+
+  - Fully responsive UI for mobile, tablet, and desktop.
+  - Discord-inspired interface with clear information hierarchy and accessibility best practices.
+
+- 💬 **Rich Message Interactions**
+
+  - Read, respond, and react to messages directly from the feed (planned/partial).
+  - Inline display of media, embeds, and reactions.
+  - Contextual message view with thread support and expanded context.
+
+- ⚡ **Performance & Scalability**
+
+  - Hybrid rendering (static + dynamic) for fast initial loads and interactive updates.
+  - Edge caching, Redis caching, and global CDN distribution for low latency.
+  - Horizontally scalable architecture: stateless API routes, distributed background workers, managed database and cache.
+
+- 🛡️ **Security & Compliance**
+
+  - OAuth2-only authentication, HTTPS everywhere, CSRF protection, and secure webhook verification.
+  - Strict Discord API compliance and robust error handling.
+
+- 🧰 **Robust Infrastructure & Tooling**
+
+  - PostgreSQL (Prisma ORM) for persistent, type-safe data storage.
+  - Redis for caching, rate limiting, and queue management.
+  - Bull for distributed job processing and queue monitoring (Bull Board dashboard).
+  - Docker support for local development and deployment.
+  - CI/CD with GitHub Actions, planned analytics and logging integrations.
+
+- 🧪 **Testing, Monitoring, and Extensibility**
+
+  - Comprehensive unit and integration tests (Jest, React Testing Library).
+  - Monitoring and autoscaling support (Vercel Analytics, Datadog/Prometheus planned).
+  - Modular, extensible codebase for future features (message interactions, analytics, offline sync, etc.).
+
+- 🚧 **Technical Limitations Transparently Addressed**
+
+  - Custom unread logic and aggregation due to Discord API constraints.
+  - Hybrid real-time/polling update strategy, with clear documentation of workarounds and limitations.
+
+- 🗺️ **Planned & Future Features**
+  - Infinite scroll, advanced message interactions, engagement analytics, offline support, and more (see Roadmap).
+
+## Authentication Flow
+
+DiscordFeed uses secure Discord OAuth2 authentication for user login and authorization. The authentication system is built with NextAuth.js, leveraging JWT sessions and Redis for token management. For a detailed step-by-step overview of the OAuth flow, see [User Authorization & OAuth Flow](./docs/user-authorization.md).
+
+## Message & Channel Indexing
+
+DiscordFeed uses a background queue-based system to efficiently index your Discord servers, channels, and messages. When you log in, the app checks if your servers and channels are already indexed. If not, it triggers a background process that fetches your server and channel data from Discord, stores it in the database, and schedules message aggregation jobs. Messages are fetched both on a schedule and in real-time via webhooks, and unread counts are calculated using message timestamps and your last read position. For a detailed breakdown of this process, see [Message & Channel Indexing Flow](./docs/indexing.md).
+
+## Tech Stack
+
+### Frontend
+
+- **Framework:** Next.js 15 (App Router)
+- **UI:** React 18 (Server and Client Components)
+- **Styling:** Tailwind CSS
+- **State Management:** React Context, Server Actions
+- **Type Checking:** TypeScript 5
+- **Testing:** Jest, React Testing Library
+
+### Backend
+
+- **API:** Next.js API Routes
+- **Auth:** NextAuth.js
+- **ORM:** Prisma (with @prisma/client)
+- **Database:** PostgreSQL (Vercel Postgres)
+- **Caching/Queue:** Redis (ioredis, Vercel KV)
+- **Job Queue:** Bull
+- **Discord Integration:** discord.js
+
+### Infrastructure & Tooling
+
+- **Containerization:** Docker (with docker-compose for local/dev)
+- **CI/CD:** GitHub Actions
+- **Monitoring:** Vercel Analytics (Datadog/Prometheus + Grafana — planned)
+- **Logging:** (ELK Stack — planned)
+- **Queue Monitoring:** Bull Board (@bull-board/api, @bull-board/express)
+- **Environment Management:** dotenv-cli
+- **Build Tools:** tsx, TypeScript, PostCSS, Autoprefixer
+- **Linting:** ESLint, eslint-config-next
+- **Code Formatting:** Prettier
+
+## Database Usage
+
+This project uses **PostgreSQL** as its primary database, managed through the [Prisma](https://www.prisma.io/) ORM. Prisma provides type-safe database access, schema migrations, and a modern query builder for Node.js and TypeScript. All data models, relationships, and migrations are defined in the [`prisma/`](./prisma) directory.
+
+- **ORM**: Prisma Client is auto-generated from the schema and used throughout the backend for safe, efficient queries.
+- **Migrations**: Database schema changes are tracked and applied using Prisma Migrate.
+- **Schema**: The full data model and entity relationships are defined in [`prisma/schema.prisma`](./prisma/schema.prisma).
+- **Visual ERD**: For a full entity relationship diagram and more Prisma-specific documentation, see [`prisma/README.md`](./prisma/README.md).
 
 ## Technical Architecture
 
@@ -82,74 +199,61 @@ graph TD
    - Client Components for interactivity
    - Real-time updates via WebSocket
 
-## Tech Stack
+## Scalability and Load Balancing
 
-### Frontend
+DiscordFeed is architected for horizontal scalability and robust load balancing at every layer of the stack. Here's how the application achieves this:
 
-- **Framework**: Next.js 15 (App Router)
-- **UI**: React Server Components, Client Components
-- **Styling**: Tailwind CSS
-- **State Management**: React Context + Server Actions
-- **Testing**: Jest, React Testing Library
+### Application Layer
 
-### Backend
+- **Next.js 15 (Edge/Serverless):** The app leverages Next.js 15, supporting both edge and serverless runtimes. This enables horizontal scaling by running multiple stateless instances across a global CDN or serverless infrastructure (e.g., Vercel, AWS Lambda).
+- **Hybrid Rendering:** Combines static server routes (for fast initial loads) and dynamic client/server components (for interactivity and real-time updates), reducing backend load for static content and scaling dynamic content as needed.
+- **Stateless API Routes:** API routes are stateless and can be deployed behind a load balancer to distribute incoming HTTP requests across multiple instances.
 
-- **API**: Next.js API Routes
-- **Auth**: NextAuth.js
-- **ORM**: Prisma
-- **Database**: PostgreSQL (Vercel Postgres)
-- **Caching**: Redis (Vercel KV)
-- **Real-time**: WebSocket, Webhooks
+### Data Layer
 
-### Infrastructure
+- **PostgreSQL (Vercel Postgres):** Used for persistent storage. PostgreSQL can be scaled vertically (larger instance) or horizontally (read replicas, sharding for very large scale).
+- **Redis (Vercel KV):** Used for caching, rate limiting, and as a message queue backend. Redis is highly performant and can be clustered for high availability and throughput.
 
-- **Hosting**: Vercel (Edge and Serverless Functions)
-- **CI/CD**: GitHub Actions
-- **Monitoring**: Vercel Analytics, Datadog/Prometheus + Grafana
-- **Logging**: ELK Stack
+### Message Aggregation & Job Queue
 
-## Data Models
+- **Bull Queue (with Redis):**
+  - Distributed processing: Multiple worker processes (or containers) can pull from the same queue, enabling horizontal scaling of background jobs.
+  - Retry/backoff: Failed jobs are retried with exponential backoff, and persistent failures are logged for monitoring.
+  - Priority & scheduling: Jobs can be prioritized and scheduled (e.g., high-priority channels polled more frequently).
+  - Monitoring: Bull Board provides a dashboard for monitoring and managing jobs.
 
-```typescript
-interface User {
-  id: string;
-  discordId: string;
-  accessToken: string;
-  refreshToken: string;
-  lastLogin: timestamp;
-  preferences: UserPreferences;
-}
+### Caching & Rate Limiting
 
-interface UserPreferences {
-  userId: string;
-  themeSetting: string;
-  serverPriorities: ServerPriority[];
-  mutedChannels: string[];
-  notificationSettings: NotificationSetting[];
-}
+- **Redis Caching:** Frequently accessed data (like recent messages per channel) is cached in Redis, reducing database and API load.
+- **Rate Limiting:** Both API requests to Discord and internal endpoints are rate-limited using Redis, preventing overload and handling Discord's strict rate limits.
 
-interface ServerMetadata {
-  id: string;
-  discordServerId: string;
-  name: string;
-  icon: string;
-  channels: ChannelMetadata[];
-}
+### Real-Time & Webhooks
 
-interface MessageCache {
-  id: string;
-  discordMessageId: string;
-  channelId: string;
-  content: string;
-  authorId: string;
-  authorName: string;
-  timestamp: timestamp;
-  attachments: Attachment[];
-  embeds: Embed[];
-  reactions: Reaction[];
-  isRead: boolean;
-}
-```
+- **WebSocket & Webhooks:** Real-time updates are delivered via WebSockets and Discord webhooks, reducing the need for constant polling and enabling efficient, event-driven updates.
+
+### Edge Network & CDN
+
+- **Global CDN Distribution:** Static assets and edge functions are distributed globally, reducing latency and offloading traffic from the origin server.
+
+### Load Balancing Strategies
+
+- **Horizontal Scaling:** Multiple instances of the app (API and workers) can be run in parallel, either as containers (Docker/Kubernetes) or serverless functions.
+- **Distributed Workers:** Any number of worker processes can be started (locally or in the cloud), all pulling from the same Bull/Redis queue. This allows the system to handle spikes in message aggregation or processing load.
+- **Managed Services:** Use managed PostgreSQL and Redis services with support for scaling, replication, and failover.
+- **CDN and Edge Functions:** Leverage CDN and edge functions for static assets and edge-optimized API routes.
+- **Monitoring and Autoscaling:** Monitor and autoscale based on queue length, API response times, and resource utilization.
+
+#### Summary Table
+
+| Layer        | Scalability Feature            | Load Balancing Approach          |
+| ------------ | ------------------------------ | -------------------------------- |
+| Frontend/API | Next.js Edge/Serverless        | Platform/Cloud load balancer     |
+| Background   | Bull Queue + Redis             | Multiple distributed workers     |
+| Database     | PostgreSQL (Prisma ORM)        | Read replicas, sharding, pooling |
+| Cache/Queue  | Redis (caching, rate limiting) | Redis clustering, managed Redis  |
+| Real-time    | WebSocket, Webhooks            | Event-driven, not polling-heavy  |
+
+**In summary:** DiscordFeed is designed for robust, cloud-native scalability and can handle high load by distributing work across multiple stateless services, background workers, and managed infrastructure components. Load balancing is achieved at both the application and background processing layers, coordinated via Redis and managed by the hosting/cloud platform's load balancer.
 
 ## Implementation Details
 
@@ -248,41 +352,65 @@ For detailed setup instructions, refer to the documentation:
 
 7. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-### Current Features (Phase 1)
-
-- ✅ Discord OAuth2 authentication
-- ✅ User/server/channel database schema
-- ✅ Channel indexing with rate limit awareness
-- ✅ User preferences system
-- ✅ Basic UI for settings and feed (placeholder)
-
-### Coming Soon (Future Phases)
-
-- 🔜 Message aggregation engine
-- 🔜 Unified feed with infinite scroll
-- 🔜 Message interactions
-- 🔜 Performance optimizations
-
 ## Project Structure
 
 ```
 discordfeed/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   ├── feed/              # Feed page components
-│   └── auth/              # Authentication pages
-├── components/            # Reusable components
-├── lib/                   # Utility functions
-├── prisma/               # Database schema and migrations
-│   ├── schema.prisma     # Prisma schema
-│   └── migrations/       # Database migrations
-├── docs/                 # Documentation
-│   ├── README.md         # Documentation index
-│   ├── environment-setup.md # Environment setup guide
-│   ├── postgresql-setup.md  # PostgreSQL setup guide
-│   ├── redis-setup.md       # Redis setup guide
-│   └── docker-compose-setup.md # Docker Compose setup guide
-└── public/               # Static assets
+├── app/                    # Next.js app directory (routing, pages, layouts, global styles)
+│   ├── api/                # API routes (REST endpoints for messages, webhooks, servers, preferences, etc.)
+│   ├── feed/               # Feed page and components (unified message feed)
+│   ├── settings/           # User settings page and components
+│   ├── login/              # Login page and components
+│   ├── providers.tsx       # React context providers
+│   ├── layout.tsx          # Root layout for the app
+│   ├── page.tsx            # Main entry page
+│   └── globals.css         # Global CSS (Tailwind base)
+├── components/             # (If present) Shared React components (UI elements, widgets, etc.)
+├── lib/                    # Utility libraries and backend helpers
+│   ├── discord/            # Discord API integration, message aggregation, queue logic
+│   ├── auth/               # Authentication utilities (e.g., Redis session helpers)
+│   ├── prisma-adapter.ts   # NextAuth.js Prisma adapter
+│   ├── prisma.ts           # Prisma client instance
+│   └── test-db.ts          # Test database utilities
+├── prisma/                 # Database schema and migrations
+│   ├── schema.prisma       # Prisma schema (data models)
+│   ├── migrations/         # Database migration files (SQL)
+│   └── README.md           # Prisma/database documentation
+├── docs/                   # Project documentation
+│   ├── README.md           # Documentation index
+│   ├── environment-setup.md# Environment setup guide
+│   ├── postgresql-setup.md # PostgreSQL setup guide
+│   ├── redis-setup.md      # Redis setup guide
+│   ├── docker-compose-setup.md # Docker Compose setup guide
+│   ├── indexing.md         # Message & channel indexing flow
+│   └── user-authorization.md # OAuth flow details
+├── scripts/                # Development and operational scripts
+│   ├── bull-board.ts       # Script to launch Bull Board (queue monitoring dashboard)
+│   └── setup.sh            # Project setup script
+├── types/                  # Custom TypeScript type definitions
+│   └── next-auth.d.ts      # NextAuth.js type extensions
+├── .memory-bank/           # Project planning, creative/design phase docs, and progress tracking
+│   ├── activeContext.md    # Current project focus/context
+│   ├── progress.md         # Progress tracking
+│   ├── tasks.md            # Task breakdown and status
+│   ├── techContext.md      # Technical context and stack
+│   ├── projectbrief.md     # Project brief/overview
+│   ├── projectStructure.md # (If present) Structure documentation
+│   └── creative-phases/    # Design/architecture decision docs (auth, database, aggregation, etc.)
+├── .gitignore              # Git ignore file
+├── package.json            # Project manifest (dependencies, scripts)
+├── package-lock.json       # Dependency lockfile
+├── tsconfig.json           # TypeScript configuration
+├── next-env.d.ts           # Next.js/TypeScript environment types
+├── next.config.js          # Next.js configuration
+├── tailwind.config.js      # Tailwind CSS configuration
+├── postcss.config.js       # PostCSS configuration
+├── docker-compose.yml      # Docker Compose configuration
+├── .prettierrc             # Prettier code formatting config
+├── .prettierignore         # Prettier ignore file
+├── .nvmrc                  # Node version manager config
+├── PRD.md                  # Product Requirements Document
+└── README.md               # Main project readme
 ```
 
 ## Technical Limitations and Workarounds
