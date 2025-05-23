@@ -65,6 +65,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, account, user }) {
+      // On initial sign-in, account and user are present
       if (account && user) {
         try {
           await storeTokensInRedis(user.id, {
@@ -72,14 +73,68 @@ export const authOptions: NextAuthOptions = {
             refreshToken: account.refresh_token!,
             expiresAt: account.expires_at! * 1000,
           });
+          // Also store tokens in the database (Account table)
+          await prisma.account.updateMany({
+            where: { userId: user.id, provider: 'discord' },
+            data: {
+              access_token: account.access_token!,
+              refresh_token: account.refresh_token!,
+              expires_at: account.expires_at!, // Prisma expects seconds
+            },
+          });
+          // Also store tokens in the User table
+          await prisma.user.update({
+            where: { id: user.id },
+            data: {
+              accessToken: account.access_token!,
+              refreshToken: account.refresh_token!,
+              expiresAt: new Date(account.expires_at! * 1000), // User model expects DateTime
+            },
+          });
         } catch (error) {
-          console.error("Error storing token in Redis:", error);
+          console.error("Error storing token in Redis, Account, or User table:", error);
         }
-        return {
-          ...token,
-          sub: user.id,
-          discordId: account.providerAccountId,
-        };
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.expiresAt = account.expires_at! * 1000;
+        token.sub = user.id;
+        token.discordId = account.providerAccountId;
+        return token;
+      }
+      // On subsequent calls, use token fields if available and of correct type
+      if (
+        typeof token.accessToken === 'string' &&
+        typeof token.refreshToken === 'string' &&
+        typeof token.expiresAt === 'number' &&
+        typeof token.sub === 'string'
+      ) {
+        try {
+          await storeTokensInRedis(token.sub, {
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
+            expiresAt: token.expiresAt,
+          });
+          // Also store tokens in the database (Account table)
+          await prisma.account.updateMany({
+            where: { userId: token.sub, provider: 'discord' },
+            data: {
+              access_token: token.accessToken,
+              refresh_token: token.refreshToken,
+              expires_at: Math.floor(token.expiresAt / 1000), // Prisma expects seconds
+            },
+          });
+          // Also store tokens in the User table
+          await prisma.user.update({
+            where: { id: token.sub },
+            data: {
+              accessToken: token.accessToken,
+              refreshToken: token.refreshToken,
+              expiresAt: new Date(token.expiresAt),
+            },
+          });
+        } catch (error) {
+          console.error("Error storing token in Redis, Account, or User table (refresh):", error);
+        }
       }
       return token;
     },

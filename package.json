@@ -16,8 +16,9 @@
     "db:migrate:dev": "dotenv -e .env.local -- prisma migrate dev",
     "db:studio": "dotenv -e .env.local -- prisma studio",
     "db:generate": "dotenv -e .env.local -- prisma generate",
-    "bull-board": "tsx scripts/bull-board.ts",
+    "bull-board": "dotenv -e .env.local -- tsx scripts/bull-board.ts",
     "verify": "dotenv -e .env.local -- npx tsx lib/discord/messageAggregation.verify.ts",
+    "worker": "dotenv -e .env.local -- tsx scripts/indexingWorker.ts",
     "format": "prettier --write ."
   },
   "dependencies": {
