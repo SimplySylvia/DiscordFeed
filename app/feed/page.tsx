@@ -2,8 +2,9 @@
 
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { signOut } from 'next-auth/react';
+import Image from 'next/image';
 
 interface ServerWithChannels {
   id: string;
@@ -27,6 +28,10 @@ export default function FeedPage() {
   const [servers, setServers] = useState<ServerWithChannels[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [indexing, setIndexing] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const avatarDropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownMenuRef = useRef<HTMLDivElement>(null);
+  const GRACE_BUFFER = 24; // px, adjust as needed
 
   // If not authenticated, redirect to login
   useEffect(() => {
@@ -40,7 +45,64 @@ export default function FeedPage() {
     if (status === 'authenticated') {
       fetchServersAndChannels();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
+  // Helper to check if mouse is inside grace area
+  function isInGraceArea(mouseX: number, mouseY: number) {
+    if (!avatarDropdownRef.current || !dropdownMenuRef.current) return false;
+    const avatarRect = avatarDropdownRef.current.getBoundingClientRect();
+    const dropdownRect = dropdownMenuRef.current.getBoundingClientRect();
+    // Calculate the union rectangle
+    const left = Math.min(avatarRect.left, dropdownRect.left) - GRACE_BUFFER;
+    const right = Math.max(avatarRect.right, dropdownRect.right) + GRACE_BUFFER;
+    const top = Math.min(avatarRect.top, dropdownRect.top) - GRACE_BUFFER;
+    const bottom = Math.max(avatarRect.bottom, dropdownRect.bottom) + GRACE_BUFFER;
+    return mouseX >= left && mouseX <= right && mouseY >= top && mouseY <= bottom;
+  }
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        avatarDropdownRef.current &&
+        !avatarDropdownRef.current.contains(event.target as Node) &&
+        dropdownMenuRef.current &&
+        !dropdownMenuRef.current.contains(event.target as Node)
+      ) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
+  // Grace area mouse move logic
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    let timeoutId: NodeJS.Timeout | null = null;
+    function handleMouseMove(e: MouseEvent) {
+      if (isInGraceArea(e.clientX, e.clientY)) {
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+      } else {
+        // Add a small delay before closing to allow for fast mouse movement
+        if (!timeoutId) {
+          timeoutId = setTimeout(() => {
+            setDropdownOpen(false);
+          }, 80);
+        }
+      }
+    }
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [dropdownOpen]);
 
   // Fetch servers and channels
   const fetchServersAndChannels = async () => {
@@ -184,22 +246,61 @@ export default function FeedPage() {
     );
   }
 
+  // Check if session is still loading
+  if (!session) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5865F2]"></div>
+        <p className="mt-4 text-gray-600">Connecting to Discord...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <h1 className="text-xl font-semibold text-gray-900">DiscordFeed</h1>
 
-          <nav className="flex space-x-4">
-            <a href="/settings" className="text-gray-500 hover:text-gray-700">
-              Settings
-            </a>
-            <button
-              onClick={() => signOut({ callbackUrl: '/login' })}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              Sign Out
-            </button>
+          <nav className="relative">
+            {session?.user?.image && (
+              <div
+                ref={avatarDropdownRef}
+                className="relative"
+                onMouseEnter={() => setDropdownOpen(true)}
+                onMouseLeave={() => {}} // No-op, handled by grace area
+              >
+                <Image
+                  src={session.user.image}
+                  alt="User avatar"
+                  width={32}
+                  height={32}
+                  className="rounded-full cursor-pointer border-2 border-transparent hover:border-green-500"
+                  onClick={() => setDropdownOpen((open) => !open)}
+                  tabIndex={0}
+                  onFocus={() => setDropdownOpen(true)}
+                />
+                {dropdownOpen && (
+                  <div
+                    ref={dropdownMenuRef}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+                  >
+                    <a
+                      href="/settings"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Settings
+                    </a>
+                    <button
+                      onClick={() => signOut({ callbackUrl: '/login' })}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
         </div>
       </header>

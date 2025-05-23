@@ -4,12 +4,13 @@ import { ExpressAdapter } from '@bull-board/express';
 import { createBullBoard } from '@bull-board/api';
 import { BullAdapter } from '@bull-board/api/bullAdapter';
 import { messageAggregationQueue } from '../lib/discord/messageAggregationQueue';
+import { indexUserQueue, indexGuildQueue, indexChannelsQueue } from '../lib/discord/indexQueue';
 
 const app = express();
 const serverAdapter = new ExpressAdapter();
 
 createBullBoard({
-  queues: [new BullAdapter(messageAggregationQueue)],
+  queues: [new BullAdapter(messageAggregationQueue), new BullAdapter(indexUserQueue), new BullAdapter(indexGuildQueue), new BullAdapter(indexChannelsQueue)],
   serverAdapter,
 });
 
