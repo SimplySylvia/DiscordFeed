@@ -26,6 +26,9 @@
 
 A unified feed interface for Discord that aggregates unread messages across all your servers into a single, organized view.
 
+**Status**
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/simplysylvia/discordfeed/ci.yml?style=for-the-badge&logo=githubactions&label=Build%20%2B%20Test)](https://github.com/SimplySylvia/DiscordFeed/actions/workflows/ci.yml)
+
 <!-- Frontend -->
 
 **Frontend**
@@ -39,7 +42,7 @@ A unified feed interface for Discord that aggregates unread messages across all 
 <!-- DevOps & Tooling -->
 
 **DevOps & Tooling**
-[![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI-blue?style=for-the-badge&logo=githubactions)](https://github.com/features/actions) [![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com) [![Playwright](https://img.shields.io/badge/Playwright-E2E-green?style=for-the-badge&logo=playwright)](https://playwright.dev)
+[![ESLint](https://img.shields.io/badge/ESLint-8.56.0-4B32C3?style=for-the-badge&logo=eslint)](https://eslint.org) [![Prettier](https://img.shields.io/badge/Prettier-3.2.5-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)](https://prettier.io) [![Docker](https://img.shields.io/badge/Docker-20.10.0-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com) [![Playwright](https://img.shields.io/badge/Playwright-E2E-green?style=for-the-badge&logo=playwright)](https://playwright.dev)
 
 ---
 
