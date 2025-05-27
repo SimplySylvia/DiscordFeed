@@ -40,7 +40,7 @@ A unified feed interface for Discord that aggregates unread messages across all 
 
 **Backend & Infrastructure**
 
-[![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org) [![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io) [![Bull](https://img.shields.io/badge/Bull-4.16.5-FF0000?style=for-the-badge&logo=npm)](https://github.com/OptimalBits/bull) [![Bull Board](https://img.shields.io/badge/Bull_Board-6.9.2-FF0000?style=for-the-badge&logo=npm)](https://github.com/felixmosh/bull-board)
+[![Next.js](https://img.shields.io/badge/Next.js-15.0.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org) [![Prisma](https://img.shields.io/badge/Prisma-5.7.1-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15.0-blue?style=for-the-badge&logo=postgresql)](https://www.postgresql.org) [![Redis](https://img.shields.io/badge/Redis-7.0-red?style=for-the-badge&logo=redis)](https://redis.io) [![Bull](https://img.shields.io/badge/Bull-4.16.5-FF0000?style=for-the-badge&logo=npm)](https://github.com/OptimalBits/bull) [![Bull Board](https://img.shields.io/badge/Bull_Board-6.9.2-FF0000?style=for-the-badge&logo=npm)](https://github.com/felixmosh/bull-board)
 
 <!-- DevOps & Tooling -->
 
