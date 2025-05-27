@@ -20,7 +20,8 @@
     "verify": "dotenv -e .env.local -- npx tsx lib/discord/messageAggregation.verify.ts",
     "worker": "dotenv -e .env.local -- tsx scripts/indexingWorker.ts",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "semantic-release"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.0",

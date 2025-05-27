@@ -192,6 +192,72 @@ DiscordFeed uses a background queue-based system to efficiently index your Disco
 
 ---
 
+## Versioning and Release Management
+
+DiscordFeed uses **Semantic Release** to automate versioning and release management. Semantic Release ensures that every commit adheres to the [Conventional Commits](https://www.conventionalcommits.org/) standard, allowing the application to automatically determine the next version (major, minor, or patch) based on commit messages. It also generates changelogs and publishes releases.
+
+### How Versioning Works
+
+1. **Commit Messages**:
+
+   - Commit messages must follow the Conventional Commits format:
+     ```
+     <type>[optional scope]: <description>
+     ```
+     Examples:
+     - `feat: add support for user roles`
+     - `fix(auth): resolve login issue`
+     - `chore: update dependencies`
+
+2. **Automated Versioning**:
+
+   - Semantic Release analyzes commit messages to determine the type of release:
+     - `feat`: Increments the **minor** version (e.g., `1.2.0 → 1.3.0`).
+     - `fix`: Increments the **patch** version (e.g., `1.2.0 → 1.2.1`).
+     - `BREAKING CHANGE`: Increments the **major** version (e.g., `1.2.0 → 2.0.0`).
+
+3. **Changelog Generation**:
+
+   - A changelog is automatically updated with details of the changes in each release.
+
+4. **Git Tags and Releases**:
+   - Semantic Release creates Git tags (e.g., `v1.3.0`) and publishes releases to the repository.
+
+### Scripts to Run
+
+To manage versioning and releases, use the following scripts:
+
+1. **Run Semantic Release Locally**:
+
+```bash
+npm run release
+```
+
+This script runs Semantic Release and automates the versioning process.
+
+2. **Prepare Git Hooks for Commit Validation**: Ensure that commit messages follow the Conventional Commits format by setting up Husky and Commitlint
+
+```bash
+npm run prepare
+```
+
+3. **Validate Commit Messages**: Husky automatically validates commit messages during the commit process. If you need to manually validate a commit message:
+
+```bash
+npx commitlint --edit <path-to-commit-message-file>
+```
+
+### CI/CD Integration
+
+Semantic Release is integrated into the CI/CD pipeline via GitHub Actions. On every push to the main branch:
+
+- Semantic Release analyzes commits.
+- It determines the next version, updates the changelog, and creates a release.
+
+For more details, see the release workflow configuration.
+
+---
+
 ## Tech Stack
 
 ### Frontend
